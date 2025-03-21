@@ -6,9 +6,9 @@ namespace UrlShortner.Api.Services.Auth.Interfaces
     public interface IAuthService
     {
         string GenerateJwtToken(Users user);
-        
-        Task<Users> Authenticate(LoginFormModel userLoginData);
 
-        Task<Users> Register(RegisterFormModel userRegisterData);
+        Task<Users> LoginAsync(LoginFormModel userLoginData);
+
+        Task<Users> RegisterAsync(RegisterFormModel userRegisterData);
     }
 }

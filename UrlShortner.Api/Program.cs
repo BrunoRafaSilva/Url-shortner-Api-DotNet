@@ -47,7 +47,6 @@ builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection("ApiSet
 builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<ApiSettings>>().Value);
 builder.Services
     .AddSingleton<IShortUrlFacade, ShortUrlFacade>()
-    .AddSingleton<ILoginFacade, LoginFacade>()
     .AddSingleton<IDatabaseService, DatabaseService>()
     .AddSingleton<IAuthService, AuthService>();
 
@@ -59,7 +58,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TGESTE v1"));
 }
 
-// app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

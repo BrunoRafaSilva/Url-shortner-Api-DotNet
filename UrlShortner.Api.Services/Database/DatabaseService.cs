@@ -63,9 +63,6 @@ namespace UrlShortner.Api.Services.Database
             var loginEmail = loginData.Email;
             var loginPassword = loginData.Password;
 
-            // Log temporário para depuração
-            Console.WriteLine($"[Login] Password Provided: {loginPassword}");
-
             var databaseConnection = await ConnectToDatabaseAsync();
             var resultOfSearchAsync = await databaseConnection.From<Users>().Where(u => u.Email == loginEmail).Get();
             var searchUserResult = resultOfSearchAsync.Models.ToList();
@@ -73,15 +70,11 @@ namespace UrlShortner.Api.Services.Database
             if (searchUserResult != null && searchUserResult.Count > 0)
             {
                 var user = searchUserResult[0];
-                var passwordHashed = user.Password;
+                var databasePassword = user.Password;
 
-                var saltedPassword = loginPassword + _apisettings.PasswordSalt;
+                var saltedLoginPassword = SaltPassword(loginPassword);
 
-                // Log temporário para depuração
-                Console.WriteLine($"[Login] Salted Password: {saltedPassword}");
-                Console.WriteLine($"[Login] Stored Password Hash: {passwordHashed}");
-
-                var passwordMatch = BCrypt.Net.BCrypt.Verify(saltedPassword, passwordHashed);
+                var passwordMatch = BCrypt.Net.BCrypt.Verify(saltedLoginPassword, databasePassword);
                 if (passwordMatch)
                 {
                     return user;
@@ -95,14 +88,15 @@ namespace UrlShortner.Api.Services.Database
         {
             var emailToRegister = user.Email;
             var passwordToRegister = user.Password;
-            var decryptedPasswordToRegister = DecryptPassword(passwordToRegister);
-            Console.WriteLine($"[Register] Decrypted Password: {decryptedPasswordToRegister}");
-            var passwordEncrypted = EncryptPassword(passwordToRegister);
+
+            var saltedPassword = SaltPassword(passwordToRegister);
+
+            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(saltedPassword);
 
             var userToCreate = new Users
             {
                 Email = emailToRegister,
-                Password = passwordEncrypted,
+                Password = hashedPassword,
                 Active = true,
                 Role = "Default",
                 CreatedAt = DateTime.Now
@@ -114,56 +108,18 @@ namespace UrlShortner.Api.Services.Database
             return result[0];
         }
 
-        private string EncryptPassword(string password)
+        private string SaltPassword(string? password)
         {
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                throw new ArgumentException("A senha não pode estar vazia.");
+            }
+            
             var salt = _apisettings.PasswordSalt;
             var saltedPassword = password + salt;
-            var passwordEncrypted = BCrypt.Net.BCrypt.HashPassword(saltedPassword);
 
-            // Log temporário para depuração
-            Console.WriteLine($"[Register] Salted Password: {saltedPassword}");
-            Console.WriteLine($"[Register] Encrypted Password: {passwordEncrypted}");
-
-            return passwordEncrypted;
+            return saltedPassword;
         }
 
-        private string DecryptPassword(string encryptedPassword)
-        {
-            try
-            {
-                // Decodifica a chave e o IV de Base64 para bytes
-                var key = Convert.FromBase64String(_apisettings.EncryptionKey);
-                var iv = Convert.FromBase64String(_apisettings.EncryptionIV);
-
-                // Verifica se o comprimento da chave é válido
-                if (key.Length != 16 && key.Length != 24 && key.Length != 32)
-                {
-                    throw new ArgumentException("EncryptionKey deve ter 16, 24 ou 32 bytes após a decodificação Base64.");
-                }
-
-                using (var aes = Aes.Create())
-                {
-                    aes.Key = key;
-                    aes.IV = iv;
-                    aes.Mode = CipherMode.CBC;
-                    aes.Padding = PaddingMode.PKCS7;
-
-                    var decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
-                    var encryptedBytes = Convert.FromBase64String(encryptedPassword);
-
-                    using (var ms = new MemoryStream(encryptedBytes))
-                    using (var cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
-                    using (var sr = new StreamReader(cs))
-                    {
-                        return sr.ReadToEnd(); // Retorna a senha descriptografada
-                    }
-                }
-            }
-            catch (CryptographicException ex)
-            {
-                Console.WriteLine($"Erro de descriptografia: {ex.Message}");
-                throw new InvalidOperationException("Falha ao descriptografar a senha. Verifique a chave, o IV e os dados criptografados.", ex);
-            }
-        }
     }
 }

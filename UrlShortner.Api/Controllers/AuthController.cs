@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using UrlShortner.Api.Facade.Interfaces;
 using UrlShortner.Api.Models.Auth.Models;
 using UrlShortner.Api.Services.Auth.Interfaces;
 
@@ -10,28 +11,37 @@ namespace UrlShortner.Api.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly IAuthService _authService;
+        private readonly IAuthFacade _authFacade;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthFacade authFacade)
         {
-            _authService = authService;
+            _authFacade = authFacade;
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginFormModel loginData)
         {
-            var userAutentication = await _authService.Authenticate(loginData);
+            var token = await _authFacade.LoginAsync(loginData);
 
-            if (userAutentication == null)
+            if (token == null)
                 return Unauthorized(new { message = "Usuário ou senha inválidos" });
-
-            var token = _authService.GenerateJwtToken(userAutentication);
 
             return Ok(new
             {
                 Message = "Usuário autenticado com sucesso",
                 Token = token
             });
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterFormModel registerData)
+        {
+            var success = await _authFacade.RegisterAsync(registerData);
+
+            if (!success)
+                return BadRequest(new { message = "Erro ao registrar usuário" });
+
+            return Ok(new { message = "Usuário registrado com sucesso" });
         }
 
         [Authorize]
@@ -45,17 +55,6 @@ namespace UrlShortner.Api.Controllers
             var role = User.FindFirst(ClaimTypes.Role)?.Value;
 
             return Ok(new { userId, username, email, role });
-        }
-
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterFormModel registerData)
-        {
-            var user = await _authService.Register(registerData);
-
-            if (user == null)
-                return BadRequest(new { message = "Erro ao registrar usuário" });
-
-            return Ok(new { message = "Usuário registrado com sucesso" });
         }
     }
 }

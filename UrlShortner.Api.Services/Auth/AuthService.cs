@@ -1,7 +1,6 @@
 
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -31,8 +30,8 @@ namespace UrlShortner.Api.Services.Auth
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
+                new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new(ClaimTypes.Email, user.Email ?? string.Empty),
             };
 
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -49,15 +48,7 @@ namespace UrlShortner.Api.Services.Auth
             return tokenHandler.WriteToken(token);
         }
 
-        private string HashPassword(string password)
-        {
-            var salt = _apisettings.PasswordSalt;
-            var saltedPassword = password + salt;
-            var hashedBytes = SHA256.HashData(Encoding.UTF8.GetBytes(saltedPassword));
-            return Convert.ToBase64String(hashedBytes);
-        }
-
-        public async Task<Users> Authenticate(LoginFormModel userLoginData)
+        public async Task<Users> LoginAsync(LoginFormModel userLoginData)
         {
             var userSearch = await _databaseService.LoginAsync(userLoginData);
             if (userSearch == null)
@@ -67,26 +58,15 @@ namespace UrlShortner.Api.Services.Auth
 
             var foundUserData = userSearch;
 
-            var userLoginPassword = userLoginData.Password;
-            var foundUserPassword = foundUserData.Password;
-
-            var decryptedUserLoginPassword = userLoginPassword;
-
-            if (decryptedUserLoginPassword != foundUserPassword)
-            {
-                throw new InvalidOperationException("Usuário ou senha incorretos");
-            }
-
             return new Users
             {
                 Id = foundUserData.Id,
                 Email = foundUserData.Email,
                 Role = foundUserData.Email,
-                Password = foundUserData.Password
             };
         }
 
-        public async Task<Users> Register(RegisterFormModel userRegisterData)
+        public async Task<Users> RegisterAsync(RegisterFormModel userRegisterData)
         {
             var userRegisterEmail = userRegisterData.Email;
             var userRegisterPassword = userRegisterData.Password;
