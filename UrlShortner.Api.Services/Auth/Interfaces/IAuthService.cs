@@ -9,6 +9,6 @@ namespace UrlShortner.Api.Services.Auth.Interfaces
 
         Task<Users> LoginAsync(LoginFormModel userLoginData);
 
-        Task<Users> RegisterAsync(RegisterFormModel userRegisterData);
+        Task<bool> RegisterAsync(RegisterFormModel userRegisterData);
     }
 }

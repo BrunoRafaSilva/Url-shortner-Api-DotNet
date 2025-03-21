@@ -1,7 +1,9 @@
 
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection.Metadata;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using UrlShortner.Api.Models.Auth.Models;
@@ -16,6 +18,7 @@ namespace UrlShortner.Api.Services.Auth
     {
         private readonly ApiSettings _apisettings;
         private readonly IDatabaseService _databaseService;
+        private const int EXPIRE_TIME = 50;
 
         public AuthService(IOptions<ApiSettings> apiSettings, IDatabaseService databaseService)
         {
@@ -25,8 +28,12 @@ namespace UrlShortner.Api.Services.Auth
 
         public string GenerateJwtToken(Users user)
         {
+            var secretJwtKey = _apisettings.SecretJwtKey;
+            var issuer = _apisettings.Issuer;
+            var audience = _apisettings.Audience;
+
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_apisettings.SecretJwtKey);
+            var key = Encoding.ASCII.GetBytes(secretJwtKey);
 
             var claims = new List<Claim>
             {
@@ -37,9 +44,9 @@ namespace UrlShortner.Api.Services.Auth
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddMinutes(1),
-                Issuer = _apisettings.Issuer,
-                Audience = _apisettings.Audience,
+                Expires = DateTime.UtcNow.AddMinutes(EXPIRE_TIME),
+                Issuer = issuer,
+                Audience = audience,
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
@@ -66,7 +73,7 @@ namespace UrlShortner.Api.Services.Auth
             };
         }
 
-        public async Task<Users> RegisterAsync(RegisterFormModel userRegisterData)
+        public async Task<bool> RegisterAsync(RegisterFormModel userRegisterData)
         {
             var userRegisterEmail = userRegisterData.Email;
             var userRegisterPassword = userRegisterData.Password;
@@ -77,13 +84,7 @@ namespace UrlShortner.Api.Services.Auth
                 Password = userRegisterPassword
             };
             var userEntity = await _databaseService.RegisterUserAsync(userToRegister);
-            return new Users
-            {
-                Id = userEntity.Id,
-                Email = userEntity.Email,
-                Role = userEntity.Email,
-                Password = userEntity.Password
-            };
+            return userEntity.Active;
         }
 
     }

@@ -42,13 +42,24 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "TGESTE", Version = "v1" });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Insira o token JWT no formato: Bearer {seu token}"
+    });
 });
 builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection("ApiSettings"));
 builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<ApiSettings>>().Value);
 builder.Services
-    .AddSingleton<IShortUrlFacade, ShortUrlFacade>()
-    .AddSingleton<IDatabaseService, DatabaseService>()
-    .AddSingleton<IAuthService, AuthService>();
+    .AddScoped<IShortUrlFacade, ShortUrlFacade>()
+    .AddScoped<IAuthFacade, AuthFacade>()
+    .AddScoped<IAuthService, AuthService>()
+    .AddScoped<IDatabaseService, DatabaseService>();
 
 var app = builder.Build();
 
