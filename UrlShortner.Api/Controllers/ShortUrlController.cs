@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UrlShortner.Api.Facade.Interfaces;
 using UrlShortner.Api.Models.ShortUrl.Requests;
@@ -16,6 +18,7 @@ namespace UrlShortner.Api.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> Get()
         {
             var result = await _shortUrlFacade.GetOriginalUrlAsync();
@@ -23,8 +26,10 @@ namespace UrlShortner.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Post([FromBody] RegisterNewUrlRequest registerUrlObject)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var urlToShort = registerUrlObject.OriginalUrl;
             var result = await _shortUrlFacade.RegisterShortUrlAsync(urlToShort);
             return Ok(result);

@@ -39,6 +39,7 @@ namespace UrlShortner.Api.Services.Auth
             {
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new(ClaimTypes.Email, user.Email ?? string.Empty),
+                new(ClaimTypes.Role, user.Role ?? string.Empty),
             };
 
             var tokenDescriptor = new SecurityTokenDescriptor

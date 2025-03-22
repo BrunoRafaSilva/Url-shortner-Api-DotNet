@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UrlShortner.Api.Facade.Interfaces;
 using UrlShortner.Api.Models.Auth.Models;
-using UrlShortner.Api.Services.Auth.Interfaces;
 
 namespace UrlShortner.Api.Controllers
 {

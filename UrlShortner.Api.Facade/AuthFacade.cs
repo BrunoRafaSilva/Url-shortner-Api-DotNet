@@ -25,7 +25,7 @@ namespace UrlShortner.Api.Services.Auth
         public async Task<bool> RegisterAsync(RegisterFormModel registerData)
         {
             var user = await _authService.RegisterAsync(registerData);
-            return user != null;
+            return user;
         }
     }
 }
