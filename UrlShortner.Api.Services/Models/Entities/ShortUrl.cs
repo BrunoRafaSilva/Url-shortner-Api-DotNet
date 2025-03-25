@@ -7,7 +7,7 @@ using Supabase.Postgrest.Models;
 namespace UrlShortner.Models
 {
     [Table("short_urls")]
-    public class ShortUrl : BaseModel
+    public class ShortUrls : BaseModel
     {
         [PrimaryKey("id")]
         public string? Id { get; set; }
@@ -16,12 +16,15 @@ namespace UrlShortner.Models
         public string? OriginalUrl { get; set; }
 
         [Column("visit_count")]
-        public int? VisitCount { get; set; }
-        
+        public int VisitCount { get; set; } = 0;
+
         [Column("owner_id")]
         public int OwnerId { get; set; }
 
         [Column("created_at")]
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        [Column("link_reference")]
+        public string? LinkReference { get; set; } = Guid.NewGuid().ToString();
     }
 }
