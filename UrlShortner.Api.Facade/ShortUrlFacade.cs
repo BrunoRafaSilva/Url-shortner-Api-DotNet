@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using UrlShortner.Api.Facade.Interfaces;
 using UrlShortner.Api.Services.Database.Interfaces;
-using UrlShortner.Api.Services.Models.UI;
 
 namespace UrlShortner.Api.Facade
 {
@@ -11,7 +10,7 @@ namespace UrlShortner.Api.Facade
         private readonly IDatabaseService _databaseService;
 
 
-        public ShortUrlFacade(IDatabaseService databaseService, ApiSettings apiSettings)
+        public ShortUrlFacade(IDatabaseService databaseService)
         {
             _databaseService = databaseService;
         }
