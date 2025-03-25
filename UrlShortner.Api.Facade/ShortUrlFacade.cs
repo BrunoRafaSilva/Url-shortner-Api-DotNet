@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using UrlShortner.Api.Facade.Interfaces;
 using UrlShortner.Api.Services.Database.Interfaces;
+using UrlShortner.Models;
 
 namespace UrlShortner.Api.Facade
 {
@@ -15,9 +16,14 @@ namespace UrlShortner.Api.Facade
             _databaseService = databaseService;
         }
 
-        public async Task<IActionResult> RegisterShortUrlAsync(string originalUrl)
+        public async Task<IActionResult> RegisterShortUrlAsync(string originalUrl, int userId)
         {
-            var registerShortUrl = await _databaseService.RegisterShortUrlAsync(originalUrl);
+            var urlToShort = new ShortUrls
+            {
+                OriginalUrl = originalUrl,
+                OwnerId = userId
+            };
+            var registerShortUrl = await _databaseService.RegisterShortUrlAsync(urlToShort);
             return registerShortUrl;
         }
 

@@ -42,18 +42,10 @@ namespace UrlShortner.Api.Services.Database
             return new OkObjectResult(result);
         }
 
-        public async Task<IActionResult> RegisterShortUrlAsync(string originalUrl)
+        public async Task<IActionResult> RegisterShortUrlAsync(ShortUrls shortUrl)
         {
             var databaseConnection = await ConnectToDatabaseAsync();
-            var shortUrl = new ShortUrl
-            {
-                OriginalUrl = originalUrl,
-                VisitCount = 0,
-                CreatedAt = DateTime.Now,
-                OwnerId = 1
-            };
-
-            var resultOfInsertAsync = await databaseConnection.From<ShortUrl>().Insert(shortUrl);
+            var resultOfInsertAsync = await databaseConnection.From<ShortUrls>().Insert(shortUrl);
             var result = resultOfInsertAsync.Models.ToList();
             return new OkObjectResult(result);
         }
@@ -114,7 +106,7 @@ namespace UrlShortner.Api.Services.Database
             {
                 throw new ArgumentException("A senha não pode estar vazia.");
             }
-            
+
             var salt = _apisettings.PasswordSalt;
             var saltedPassword = password + salt;
 

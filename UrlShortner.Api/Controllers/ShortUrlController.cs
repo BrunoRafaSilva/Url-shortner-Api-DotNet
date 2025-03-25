@@ -30,8 +30,12 @@ namespace UrlShortner.Api.Controllers
         public async Task<IActionResult> Post([FromBody] RegisterNewUrlRequest registerUrlObject)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userId, out var userIdInt))
+            {
+                return BadRequest("Invalid user ID.");
+            }
             var urlToShort = registerUrlObject.OriginalUrl;
-            var result = await _shortUrlFacade.RegisterShortUrlAsync(urlToShort);
+            var result = await _shortUrlFacade.RegisterShortUrlAsync(urlToShort, userIdInt);
             return Ok(result);
         }
     }

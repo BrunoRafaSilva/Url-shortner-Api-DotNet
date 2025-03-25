@@ -9,7 +9,7 @@ namespace UrlShortner.Api.Facade.Interfaces
 {
     public interface IShortUrlFacade
     {
-        Task<IActionResult> RegisterShortUrlAsync(string originalUrl);
+        Task<IActionResult> RegisterShortUrlAsync(string originalUrl, int userId);
         Task<IActionResult> GetOriginalUrlAsync();
     }
 }
