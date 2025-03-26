@@ -28,18 +28,13 @@ namespace UrlShortner.Api.Facade
             if (registerShortUrl is ObjectResult objectResult && objectResult.Value is List<ShortUrls> value && value.Count > 0)
             {
                 var shortUrl = value[0];
-                var response = new RegisterNewUrlResponse
+                var responseUrl = new RegisterNewUrlResponse
                 {
                     LinkReference = shortUrl.LinkReference ?? string.Empty,
                     OriginalUrl = shortUrl.OriginalUrl ?? string.Empty,
                 };
 
-                return new OkObjectResult(new
-                {
-                    success = true,
-                    message = "Short URL registered successfully.",
-                    data = response
-                });
+                return new OkObjectResult(responseUrl);
             }
 
             return new BadRequestObjectResult(new

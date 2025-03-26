@@ -36,7 +36,7 @@ namespace UrlShortner.Api.Controllers
             }
             var urlToShort = registerUrlObject.OriginalUrl;
             var result = await _shortUrlFacade.RegisterShortUrlAsync(urlToShort, userIdInt);
-            return Ok(result);
+            return result;
         }
     }
 }
