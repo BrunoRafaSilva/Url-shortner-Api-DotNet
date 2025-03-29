@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using UrlShortner.Api.Facade;
 using UrlShortner.Api.Facade.Interfaces;
+using UrlShortner.Api.Middleware;
 using UrlShortner.Api.Services.Auth;
 using UrlShortner.Api.Services.Auth.Interfaces;
 using UrlShortner.Api.Services.Database;
@@ -83,8 +84,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TGESTE v1"));
 }
+app.UseErrorHandling();
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
