@@ -37,9 +37,31 @@ namespace UrlShortner.Api.Services.Database
         public async Task<IActionResult> GetOriginalUrlAsync()
         {
             var databaseConnection = await ConnectToDatabaseAsync();
-            var resultOfSearchAsync = await databaseConnection.From<City>().Get();
+            var resultOfSearchAsync = await databaseConnection.From<ShortUrls>().Get();
             var result = resultOfSearchAsync.Models.ToList();
             return new OkObjectResult(result);
+        }
+
+        public async Task<string> GetRedirectUrlFromGuid(string shortUrl)
+        {
+            var databaseConnection = await ConnectToDatabaseAsync();
+            var resultOfSearchAsync = await databaseConnection.From<ShortUrls>().Where(u => u.LinkReference == shortUrl).Get();
+            var searchUserResult = resultOfSearchAsync.Models.ToList();
+
+            if (searchUserResult != null && searchUserResult.Count > 0)
+            {
+                var shortUrlToUpdate = searchUserResult[0];
+                shortUrlToUpdate.VisitCount += 1;
+
+                await databaseConnection
+                    .From<ShortUrls>()
+                    .Where(u => u.Id == shortUrlToUpdate.Id)
+                    .Update(shortUrlToUpdate);
+
+                return shortUrlToUpdate.OriginalUrl ?? string.Empty;
+            }
+
+            return string.Empty;
         }
 
         public async Task<IActionResult> RegisterShortUrlAsync(ShortUrls shortUrl)

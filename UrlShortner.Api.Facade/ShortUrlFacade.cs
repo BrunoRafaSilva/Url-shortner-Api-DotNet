@@ -49,5 +49,11 @@ namespace UrlShortner.Api.Facade
             var getOriginalLink = await _databaseService.GetOriginalUrlAsync();
             return getOriginalLink;
         }
+
+        public async Task<string> GetRedirectUrlFromGuid(string shortUrl)
+        {
+            var redirectUrl = await _databaseService.GetRedirectUrlFromGuid(shortUrl);
+            return redirectUrl;
+        }
     }
 }

@@ -8,9 +8,10 @@ namespace UrlShortner.Api.Services.Database.Interfaces
 {
     public interface IDatabaseService
     {
-        Task<IActionResult> GetOriginalUrlAsync();
-        Task<IActionResult> RegisterShortUrlAsync(ShortUrls shortUrl);
         Task<Users?> LoginAsync(LoginFormModel loginData);
         Task<Users> RegisterUserAsync(Users user);
+        Task<IActionResult> GetOriginalUrlAsync();
+        Task<string> GetRedirectUrlFromGuid(string shortUrl);
+        Task<IActionResult> RegisterShortUrlAsync(ShortUrls shortUrl);
     }
 }

@@ -17,15 +17,22 @@ namespace UrlShortner.Api.Controllers
             _shortUrlFacade = shortUrlFacade;
         }
 
-        [HttpGet]
+        [HttpGet("ListAllLinks")]
         [Authorize]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> GetUrls()
         {
             var result = await _shortUrlFacade.GetOriginalUrlAsync();
             return Ok(result);
         }
 
-        [HttpPost]
+        [HttpGet("getRedirectLink/{shortUrl}")]
+        public async Task<IActionResult> Get(string shortUrl)
+        {
+            var result = await _shortUrlFacade.GetRedirectUrlFromGuid(shortUrl);
+            return Redirect(result);
+        }
+
+        [HttpPost("RegisterNewUrl")]
         [Authorize]
         public async Task<IActionResult> Post([FromBody] RegisterNewUrlRequest registerUrlObject)
         {

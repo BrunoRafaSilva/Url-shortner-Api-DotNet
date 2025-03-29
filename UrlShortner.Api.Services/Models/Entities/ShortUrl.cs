@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Supabase.Postgrest.Attributes;
 using Supabase.Postgrest.Models;
 
@@ -26,5 +23,8 @@ namespace UrlShortner.Models
 
         [Column("link_reference")]
         public string? LinkReference { get; set; } = Guid.NewGuid().ToString();
+
+        [Column("is_active")]
+        public bool IsActive { get; set; } 
     }
 }
