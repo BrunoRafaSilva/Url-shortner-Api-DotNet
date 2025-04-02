@@ -34,7 +34,7 @@ namespace UrlShortner.Api.Services.Database
             return databaseConnection;
         }
 
-        public async Task<IActionResult> GetOriginalUrlAsync()
+        public async Task<IActionResult> GetAllUrlAsync()
         {
             var databaseConnection = await ConnectToDatabaseAsync();
             var resultOfSearchAsync = await databaseConnection.From<ShortUrls>().Get();
