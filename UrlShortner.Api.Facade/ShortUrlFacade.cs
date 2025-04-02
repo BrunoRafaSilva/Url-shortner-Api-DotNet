@@ -44,7 +44,7 @@ namespace UrlShortner.Api.Facade
             });
         }
 
-        public async Task<IActionResult> GetOriginalUrlAsync()
+        public async Task<IActionResult> GetAllRegistredlUrlsAsync()
         {
             var getOriginalLink = await _databaseService.GetAllUrlAsync();
             return getOriginalLink;

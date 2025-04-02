@@ -21,7 +21,7 @@ namespace UrlShortner.Api.Controllers
         [Authorize]
         public async Task<IActionResult> GetUrls()
         {
-            var result = await _shortUrlFacade.GetOriginalUrlAsync();
+            var result = await _shortUrlFacade.GetAllRegistredlUrlsAsync();
             return Ok(result);
         }
 
